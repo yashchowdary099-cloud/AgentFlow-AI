@@ -5,7 +5,7 @@
  */
 
 // Base API URL: Points to backend at port 8000 when frontend is served on port 5500 or other ports
-const API_BASE = (window.location.port === '8000') ? '' : 'http://127.0.0.1:8000';
+const API_BASE = (window.location.port === '8000') ? '' : 'https://agentflow-ai-sjsi.onrender.com';
 
 // Application State
 const state = {
@@ -31,7 +31,7 @@ const elements = {
   sidebar: document.getElementById('sidebar'),
   sidebarBackdrop: document.getElementById('sidebar-backdrop'),
   conversationsList: document.getElementById('conversations-list'),
-  
+
   // Document status elements
   documentCard: document.getElementById('document-card'),
   docName: document.getElementById('doc-name'),
@@ -40,7 +40,7 @@ const elements = {
   uploadProgressContainer: document.getElementById('upload-progress-container'),
   uploadProgressFill: document.getElementById('upload-progress-fill'),
   uploadStatusText: document.getElementById('upload-status-text'),
-  
+
   // Header / indicator elements
   apiStatusDot: document.getElementById('api-status-dot'),
   apiStatusLabel: document.getElementById('api-status-label'),
@@ -181,7 +181,7 @@ async function handleSendMessage() {
   // Clear input
   elements.userInput.value = '';
   elements.userInput.style.height = 'auto';
-  
+
   // Hide welcome screen if visible
   if (elements.welcomeScreen.style.display !== 'none') {
     elements.welcomeScreen.style.display = 'none';
@@ -222,7 +222,7 @@ async function handleSendMessage() {
     }
 
     const data = await res.json();
-    
+
     // Update active conversation ID
     if (data.conversation_id) {
       state.conversationId = data.conversation_id;
@@ -233,7 +233,7 @@ async function handleSendMessage() {
 
     // Append AI response
     appendAssistantMessage(data.answer, data.tool_used, data.activity);
-    
+
     // Reload sidebar conversations to reflect new title/activity
     loadConversations();
   } catch (err) {
@@ -258,7 +258,7 @@ async function handleSendMessage() {
 function appendUserMessage(text) {
   const msgDiv = document.createElement('div');
   msgDiv.className = 'message-wrapper user';
-  
+
   msgDiv.innerHTML = `
     <div class="avatar" title="You">
       <i class="fa-solid fa-user"></i>
@@ -267,7 +267,7 @@ function appendUserMessage(text) {
       <div class="message-content">${escapeHTML(text)}</div>
     </div>
   `;
-  
+
   elements.messagesList.appendChild(msgDiv);
 }
 
@@ -446,7 +446,7 @@ async function handleFileUpload(e) {
     if (elements.welcomeScreen.style.display !== 'none') {
       elements.welcomeScreen.style.display = 'none';
     }
-    
+
     appendAssistantMessage(
       `📄 **Document Uploaded Successfully!**\n\n` +
       `**Filename**: \`${data.filename}\`\n` +
@@ -491,7 +491,7 @@ async function startNewChat(shouldCreateOnBackend = true) {
   // Clear UI messages
   elements.messagesList.innerHTML = '';
   elements.welcomeScreen.style.display = 'flex';
-  
+
   if (shouldCreateOnBackend) {
     try {
       const res = await fetch(`${API_BASE}/api/new-chat`, { method: 'POST' });
@@ -572,10 +572,10 @@ async function loadConversationHistory(conversationId) {
   try {
     const res = await fetch(`${API_BASE}/api/history/${conversationId}`);
     const messages = await res.json();
-    
+
     state.conversationId = conversationId;
     elements.messagesList.innerHTML = '';
-    
+
     if (messages.length > 0) {
       elements.welcomeScreen.style.display = 'none';
       messages.forEach(msg => {
