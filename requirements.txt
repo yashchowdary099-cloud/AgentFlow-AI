@@ -11,3 +11,4 @@ numpy>=1.26.0
 requests>=2.31.0
 python-multipart>=0.0.9
 chromadb>=0.5.0
+langchain-openrouter>=0.2.9
