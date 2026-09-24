@@ -13,9 +13,7 @@ dependencies = [
     "langchain-google-genai",
     "langchain-openrouter",
     "langgraph",
-    "google-generativeai",
     "pypdf",
-    "chromadb",
 ]
 
 [tool.vercel]
