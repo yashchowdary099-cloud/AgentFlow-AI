@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgentFlow AI — LangChain Intelligent Assistant</title>
+  
+  <!-- Modern Inter & JetBrains Mono Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  
+  <!-- FontAwesome Icons for clean SaaS look -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  
+  <!-- Marked for markdown rendering & Highlight.js for code syntax -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  
+  <!-- Frontend is served from /frontend as web root; keep asset paths relative -->
+  <link rel="stylesheet" href="./styles.css?v=1" />
+</head>
+<body>
+  <!-- App Container -->
+  <div class="app-layout">
+    
+    <!-- Mobile Header -->
+    <header class="mobile-nav">
+      <button id="mobile-menu-btn" class="icon-btn" aria-label="Toggle menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="mobile-brand">
+        <span class="brand-gradient">AgentFlow</span> AI
+      </div>
+      <button id="mobile-new-chat-btn" class="icon-btn" aria-label="New chat">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+    </header>
+
+    <!-- Sidebar Backdrop for mobile -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="logo-icon">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <div class="brand-text">
+            <h2><span class="brand-gradient">AgentFlow</span> AI</h2>
+            <p>LangChain & AI Agent Assistant</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-actions">
+        <button id="new-chat-btn" class="btn btn-primary new-chat-btn">
+          <i class="fa-solid fa-plus"></i> New Chat
+        </button>
+
+        <label for="pdf-file-input" class="btn btn-secondary upload-btn">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Upload PDF
+        </label>
+        <input type="file" id="pdf-file-input" accept="application/pdf" style="display: none;" />
+      </div>
+
+      <!-- Active Document Card -->
+      <div class="sidebar-section document-section">
+        <div class="section-title">
+          <span><i class="fa-regular fa-file-pdf"></i> Active Document</span>
+        </div>
+        
+        <div id="document-card" class="document-card empty-doc">
+          <div class="doc-icon">
+            <i class="fa-solid fa-file-lines"></i>
+          </div>
+          <div class="doc-info">
+            <div id="doc-name" class="doc-name">No PDF uploaded</div>
+            <div id="doc-meta" class="doc-meta">Upload a PDF to ask questions</div>
+          </div>
+          <button id="remove-doc-btn" class="remove-doc-btn" title="Remove PDF" style="display: none;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div id="upload-progress-container" class="upload-progress-container" style="display: none;">
+          <div class="progress-bar">
+            <div id="upload-progress-fill" class="progress-fill"></div>
+          </div>
+          <span id="upload-status-text" class="upload-status-text">Processing PDF...</span>
+        </div>
+      </div>
+
+      <!-- Capabilities Section -->
+      <div class="sidebar-section capabilities-section">
+        <div class="section-title">
+          <span><i class="fa-solid fa-bolt"></i> Capabilities</span>
+        </div>
+        <ul class="capability-list">
+          <li class="capability-item active">
+            <i class="fa-solid fa-comments"></i>
+            <span>General Knowledge & Coding</span>
+          </li>
+          <li class="capability-item active">
+            <i class="fa-solid fa-calculator"></i>
+            <span>Safe Math Evaluator</span>
+          </li>
+          <li class="capability-item active">
+            <i class="fa-solid fa-book-open"></i>
+            <span>PDF Vector Retrieval (RAG)</span>
+          </li>
+          <li class="capability-item active">
+            <i class="fa-solid fa-database"></i>
+            <span>SQLite Multi-turn Memory</span>
+          </li>
+          <li class="capability-item active">
+            <i class="fa-solid fa-diagram-project"></i>
+            <span>LangGraph Agent Routing</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Recent Conversations History -->
+      <div class="sidebar-section history-section">
+        <div class="section-title">
+          <span><i class="fa-solid fa-clock-rotate-left"></i> Recent Chats</span>
+        </div>
+        <div id="conversations-list" class="conversations-list">
+          <!-- Populated dynamically via app.js -->
+          <div class="empty-history-text">No previous chats</div>
+        </div>
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="status-indicator-box">
+          <div id="api-status-dot" class="status-dot online"></div>
+          <span id="api-status-label">Agent Ready</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Main Header -->
+      <header class="chat-header">
+        <div class="header-left">
+          <h1>AI Agent Assistant</h1>
+          <p>Ask anything. The agent automatically decides how to solve it.</p>
+        </div>
+        <div class="header-right">
+          <div class="agent-badge">
+            <span class="pulse-indicator"></span>
+            <span id="header-status">Autonomous Agent Online</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Chat Container -->
+      <div id="chat-messages-container" class="chat-messages-container">
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="welcome-screen">
+          <div class="welcome-icon">
+            <i class="fa-solid fa-sparkles"></i>
+          </div>
+          <h2>How can I help you today?</h2>
+          <p class="welcome-sub">
+            Ask any question, analyze an uploaded PDF, solve complex math, or generate code.
+          </p>
+
+          <div class="suggestion-grid">
+            <button class="suggestion-card" data-prompt="What is cloud computing and why is it important in modern software?">
+              <div class="card-icon"><i class="fa-solid fa-cloud"></i></div>
+              <div class="card-content">
+                <h4>Explain a Concept</h4>
+                <p>"What is cloud computing?"</p>
+              </div>
+            </button>
+
+            <button class="suggestion-card" data-prompt="Calculate 458 * 92 and explain what 18% of 1250 is.">
+              <div class="card-icon"><i class="fa-solid fa-calculator"></i></div>
+              <div class="card-content">
+                <h4>Solve a Calculation</h4>
+                <p>"Calculate 458 * 92"</p>
+              </div>
+            </button>
+
+            <button class="suggestion-card" data-prompt="Write Python code for binary search with time complexity analysis.">
+              <div class="card-icon"><i class="fa-solid fa-code"></i></div>
+              <div class="card-content">
+                <h4>Help Me Code</h4>
+                <p>"Python binary search code"</p>
+              </div>
+            </button>
+
+            <button class="suggestion-card" data-prompt="According to the document I uploaded, what are the key takeaways?">
+              <div class="card-icon"><i class="fa-solid fa-file-pdf"></i></div>
+              <div class="card-content">
+                <h4>Analyze a PDF</h4>
+                <p>"Summarize the uploaded document"</p>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Message Stream -->
+        <div id="messages-list" class="messages-list"></div>
+      </div>
+
+      <!-- Chat Input Dock -->
+      <div class="input-dock">
+        <form id="chat-form" class="chat-form">
+          <button type="button" id="attach-btn" class="dock-btn icon-btn" title="Upload Document">
+            <i class="fa-solid fa-paperclip"></i>
+          </button>
+          
+          <div class="input-wrapper">
+            <textarea
+              id="user-input"
+              rows="1"
+              placeholder="Ask anything... (Enter to send, Shift+Enter for new line)"
+              autocomplete="off"
+            ></textarea>
+          </div>
+
+          <button type="submit" id="send-btn" class="dock-btn send-btn" aria-label="Send message">
+            <i class="fa-solid fa-arrow-up"></i>
+          </button>
+        </form>
+        <div class="input-hints">
+          <span>AgentFlow AI v1.0 • LangChain & LangGraph Powered</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Keep app.js relative because frontend is served directly on port 5500 -->
+  <script src="./app.js?v=1"></script>
+</body>
+</html>
