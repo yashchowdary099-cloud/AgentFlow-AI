@@ -1,3 +1,25 @@
+# 🤖 AgentFlow AI
+
+AgentFlow AI is a general-purpose intelligent AI assistant built using LangChain, LangGraph, FastAPI, OpenRouter, RAG, memory, and AI tools.
+
+## 🚀 Live Application
+
+**AgentFlow AI is now live!**
+
+👉 [Launch AgentFlow AI](https://agent-flow-ai-kappa.vercel.app)
+
+## ✨ Features
+
+- 🤖 AI-powered conversations
+- 🧠 LangChain + LangGraph agent workflow
+- 🔀 Intelligent intent routing
+- 🌐 Tavily web search
+- 📄 PDF / Document RAG
+- 🧮 Smart calculator tool
+- 💾 Conversation memory
+- ⚡ OpenRouter LLM integration
+- 🚀 FastAPI backend
+- ☁️ Vercel + Render deployment
 # LangChain and AI Agents — General Purpose Intelligent AI Assistant
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
